@@ -77,7 +77,7 @@ public class TradingSystemApplication {
         walletLedgerRepository.save(wallet);
 
         AssetHolding usdtHolding = new AssetHolding();
-        usdtHolding.setQty(50000);
+        usdtHolding.setQty(5000000); // Bumped x10 from original request due to BNB and ETH are expensive
         usdtHolding.setAssetId(assetsBySymbol.get("USDT").getId());
         usdtHolding.setAccountId(successfulUser.getId());
         usdtHolding.setWallet(wallet);
