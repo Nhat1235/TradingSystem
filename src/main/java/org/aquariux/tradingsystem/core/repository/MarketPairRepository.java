@@ -9,4 +9,5 @@ import java.util.Optional;
 
 @Repository
 public interface MarketPairRepository extends JpaRepository<MarketPair, Long> {
+    Optional<MarketPair> findBySymbol(String symbol);
 }
