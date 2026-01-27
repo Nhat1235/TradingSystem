@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @Configuration
-@EnableJpaRepositories(basePackages = "org.aquariux.tradingsystem.repository")
+@EnableJpaRepositories(basePackages = "org.aquariux.tradingsystem")
 @EnableJpaAuditing
 @EnableTransactionManagement
 public class JpaConfig {
