@@ -57,6 +57,7 @@ public class TradeExecutionEngineImpl implements TradeExecutionEngine {
         balanceLedger.verifyFunding(order, marketTick);
         if (order.getType() == OrderType.LIMIT && !isExecutable(order, marketTick)) {
             order.setState(OrderState.NEW);
+            order.setLimitPrice(order.getLimitPrice());
             order.setFilledQuantity(0);
             order.setAverageFilledPrice(0);
             order.setRemainingQuantity(order.getQty());

@@ -178,22 +178,21 @@ public class MarketDataPoller {
         }
     }
 
-    private boolean canExecute(OrderBook order, MarketTicks marketTick) {
-    if (order.getState() != OrderState.NEW || order.getRemainingQuantity() <= 0) {
-        return false;
+        private boolean canExecute(OrderBook order, MarketTicks marketTick) {
+        if (order.getState() != OrderState.NEW || order.getRemainingQuantity() <= 0) {
+            return false;
+        }
+
+        if (order.getType() == OrderType.MARKET) {
+            return true;
+        }
+
+        // From here on: LIMIT orders only
+        BigDecimal limitPrice = BigDecimal.valueOf(order.getLimitPrice());
+        if (order.getSide() == OrderSide.BUY) {
+            return limitPrice.compareTo(BigDecimal.valueOf(marketTick.getAskPrice())) >= 0;
+        }
+
+        return limitPrice.compareTo(BigDecimal.valueOf(marketTick.getBidPrice())) <= 0;
     }
-
-    if (order.getType() == OrderType.MARKET) {
-        return true;
-    }
-
-    // From here on: LIMIT orders only
-    BigDecimal limitPrice = BigDecimal.valueOf(order.getLimitPrice());
-    if (order.getSide() == OrderSide.BUY) {
-        return limitPrice.compareTo(BigDecimal.valueOf(marketTick.getAskPrice())) >= 0;
-    }
-
-    return limitPrice.compareTo(BigDecimal.valueOf(marketTick.getBidPrice())) <= 0;
-}
-
 }
