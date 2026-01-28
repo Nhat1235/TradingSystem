@@ -13,6 +13,7 @@ import java.util.List;
 @Getter
 public class OrderResponse {
     private String orderId;
+    private String limitPrice;
     private String marketSymbol;
     private String orderQuantity;
     private String filledQuantity;

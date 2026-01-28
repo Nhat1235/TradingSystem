@@ -86,7 +86,29 @@ Content-Type: application/json
 }
 ```
 
+Create a limit order:
+
+```
+POST /api/v1/orders
+Content-Type: application/json
+
+{
+  "accountId": "1",
+  "symbol": "BTCUSDT",
+  "side": "BUY",
+  "type": "LIMIT",
+  "quantity": "0.01",
+  "limitPrice": "35000"
+}
+```
+
 ### Notes
 
 - Market data is polled on a schedule and stored as snapshots.
 - Swagger UI is available at `http://localhost:8081/swagger-ui/index.html#/`.
+
+### WIP 
+- Write UnitTests
+- Complete Limit Order
+- Optimize coding structure
+- Implement Locking for certain columns 

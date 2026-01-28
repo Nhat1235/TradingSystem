@@ -10,6 +10,7 @@ import org.aquariux.tradingsystem.core.repository.MarketPairRepository;
 import org.aquariux.tradingsystem.core.repository.TradeOrderRepository;
 import org.aquariux.tradingsystem.exception.BusinessException;
 import org.aquariux.tradingsystem.exception.ResourceNotFoundException;
+import org.aquariux.tradingsystem.model.BaseEntity;
 import org.aquariux.tradingsystem.order.models.requests.CreateOrderRequest;
 import org.aquariux.tradingsystem.order.models.responses.CreateOrderResponse;
 import org.aquariux.tradingsystem.order.models.responses.OrderResponse;
@@ -75,13 +76,14 @@ public class OrderServiceImpl implements OrderService {
         Map<Long, String> marketSymbolById = marketPairRepository.findAllById(
                         orders.stream().map(OrderBook::getMarketId).distinct().collect(Collectors.toList()))
                 .stream()
-                .collect(Collectors.toMap(market -> market.getId(), market -> market.getSymbol(), (a, b) -> a, HashMap::new));
+                .collect(Collectors.toMap(BaseEntity::getId, MarketPair::getSymbol, (a, b) -> a, HashMap::new));
 
         return orders.stream()
                 .map(order -> OrderResponse.builder()
                         .orderId(String.valueOf(order.getId()))
                         .marketSymbol(marketSymbolById.getOrDefault(order.getMarketId(), ""))
                         .orderQuantity(String.valueOf(order.getQty()))
+                        .limitPrice(String.valueOf(order.getLimitPrice()))
                         .filledQuantity(String.valueOf(order.getFilledQuantity()))
                         .averageFilledPrice(String.valueOf(order.getAverageFilledPrice()))
                         .remainingQuantity(String.valueOf(order.getRemainingQuantity()))
