@@ -5,6 +5,7 @@ import org.aquariux.tradingsystem.core.domain.asset.AssetHolding;
 import org.aquariux.tradingsystem.core.domain.order.OrderBook;
 import org.aquariux.tradingsystem.core.domain.order.OrderHistory;
 import org.aquariux.tradingsystem.core.domain.order.OrderSide;
+import org.aquariux.tradingsystem.core.domain.order.OrderType;
 import org.aquariux.tradingsystem.core.domain.user.WalletLedger;
 import org.aquariux.tradingsystem.core.marketdata.MarketTicks;
 import org.aquariux.tradingsystem.core.repository.AssetHoldingRepository;
@@ -39,7 +40,8 @@ public class BalanceLedgerImpl implements BalanceLedger {
     }
 
     private void checkAssetBalanceForBuyOrder(Optional<AssetHolding> assetHolding, MarketTicks marketTick, OrderBook order) {
-        double totalOrderPrice = marketTick.getAskPrice() * order.getQty();
+        double unitPrice = order.getType() == OrderType.LIMIT ? order.getLimitPrice() : marketTick.getAskPrice();
+        double totalOrderPrice = unitPrice * order.getQty();
         if (assetHolding.isEmpty() || assetHolding.get().getQty() < totalOrderPrice) {
             throw new BusinessException("Insufficient fund in wallet.");
         }

@@ -23,6 +23,7 @@ import org.springframework.web.client.RestTemplate;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -154,6 +155,10 @@ public class MarketDataPoller {
         marketQuoteSnapshotRepository.save(marketQuoteSnapshot);
     }
 
+    /*
+        This function will try and match then execute with every order that has is valid,
+        normally in other trading system there will be a logic to determine the best order to match based on price and time
+    */
     private void tryMatchInstantly(MarketTicks marketTick) {
         List<OrderBook> orders = tradeOrderRepository.findAllByMarketIdAndState(
                 marketTick.getMarketId(), OrderState.NEW);

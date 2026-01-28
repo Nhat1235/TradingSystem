@@ -1,8 +1,10 @@
 package org.aquariux.tradingsystem.core.engine;
 
 import org.aquariux.tradingsystem.core.domain.order.OrderHistory;
-import org.aquariux.tradingsystem.core.domain.order.OrderState;
 import org.aquariux.tradingsystem.core.domain.order.OrderBook;
+import org.aquariux.tradingsystem.core.domain.order.OrderSide;
+import org.aquariux.tradingsystem.core.domain.order.OrderState;
+import org.aquariux.tradingsystem.core.domain.order.OrderType;
 import org.aquariux.tradingsystem.core.ledger.BalanceLedger;
 import org.aquariux.tradingsystem.core.marketdata.MarketTicks;
 import org.aquariux.tradingsystem.core.repository.MarketQuoteSnapshotRepository;
@@ -53,6 +55,18 @@ public class TradeExecutionEngineImpl implements TradeExecutionEngine {
                 .orElseThrow(() -> new BusinessException("Market data unavailable for market id " + marketId));
 
         balanceLedger.verifyFunding(order, marketTick);
+        if (order.getType() == OrderType.LIMIT && !isExecutable(order, marketTick)) {
+            order.setState(OrderState.NEW);
+            order.setFilledQuantity(0);
+            order.setAverageFilledPrice(0);
+            order.setRemainingQuantity(order.getQty());
+            OrderBook pendingOrder = tradeOrderRepository.save(order);
+            return CreateOrderResponse.builder()
+                    .orderId(String.valueOf(pendingOrder.getId()))
+                    .orderStatus(pendingOrder.getState().name())
+                    .createdAt(pendingOrder.getCreatedAt().toString())
+                    .build();
+        }
 
         OrderHistory trade = new OrderHistory();
         trade.setMarketId(order.getMarketId());
@@ -113,6 +127,17 @@ public class TradeExecutionEngineImpl implements TradeExecutionEngine {
         pendingOrder.setAverageFilledPrice(0);
         pendingOrder.setRemainingQuantity(order.getRemainingQuantity());
         return pendingOrder;
+    }
+
+    private static boolean isExecutable(OrderBook order, MarketTicks marketTick) {
+        if (order.getType() == OrderType.MARKET) {
+            return true;
+        }
+        BigDecimal limitPrice = BigDecimal.valueOf(order.getLimitPrice());
+        if (order.getSide() == OrderSide.BUY) {
+            return limitPrice.compareTo(BigDecimal.valueOf(marketTick.getAskPrice())) >= 0;
+        }
+        return limitPrice.compareTo(BigDecimal.valueOf(marketTick.getBidPrice())) <= 0;
     }
 
     private static BigDecimal minQty(BigDecimal left, BigDecimal right) {
