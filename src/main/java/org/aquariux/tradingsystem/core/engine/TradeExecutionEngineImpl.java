@@ -58,19 +58,19 @@ public class TradeExecutionEngineImpl implements TradeExecutionEngine {
         trade.setMarketId(order.getMarketId());
         trade.setSide(order.getSide());
         order.setState(OrderState.EXECUTED);
-        BigDecimal orderQty = roundQty(order.getQty());
+        BigDecimal orderQty = BigDecimal.valueOf(order.getQty());
         switch (order.getSide()) {
             case BUY -> {
-                BigDecimal fillQty = minQty(orderQty, roundQty(marketTick.getAskSize()));
+                BigDecimal fillQty = minQty(orderQty, BigDecimal.valueOf(marketTick.getAskSize()));
                 order.setFilledQuantity(fillQty.doubleValue());
-                double fillPrice = roundPrice(marketTick.getAskPrice());
+                double fillPrice = marketTick.getAskPrice();
                 order.setAverageFilledPrice(fillPrice);
                 trade.setFilledPrice(fillPrice);
             }
             case SELL -> {
-                BigDecimal fillQty = minQty(orderQty, roundQty(marketTick.getBidSize()));
+                BigDecimal fillQty = minQty(orderQty, BigDecimal.valueOf(marketTick.getBidSize()));
                 order.setFilledQuantity(fillQty.doubleValue());
-                double fillPrice = roundPrice(marketTick.getBidPrice());
+                double fillPrice = marketTick.getBidPrice();
                 order.setAverageFilledPrice(fillPrice);
                 trade.setFilledPrice(fillPrice);
             }
@@ -113,14 +113,6 @@ public class TradeExecutionEngineImpl implements TradeExecutionEngine {
         pendingOrder.setAverageFilledPrice(0);
         pendingOrder.setRemainingQuantity(order.getRemainingQuantity());
         return pendingOrder;
-    }
-
-    private static BigDecimal roundQty(double value) {
-        return BigDecimal.valueOf(value).setScale(8, RoundingMode.DOWN);
-    }
-
-    private static double roundPrice(double value) {
-        return BigDecimal.valueOf(value).setScale(8, RoundingMode.DOWN).doubleValue();
     }
 
     private static BigDecimal minQty(BigDecimal left, BigDecimal right) {
